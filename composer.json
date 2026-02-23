@@ -1,0 +1,25 @@
+{
+    "name": "aceextensions/module-imageoptimizer",
+    "description": "Image Optimizer module for Magento 2. Adds WebP and AVIF support and enforces ImageMagick.",
+    "type": "magento2-module",
+    "version": "1.0.1",
+    "license": [
+        "OSL-3.0",
+        "AFL-3.0"
+    ],
+    "require": {
+        "php": "~7.4.0||~8.1.0||~8.2.0||~8.3.0",
+        "magento/framework": "*",
+        "magento/module-catalog": "*",
+        "magento/module-media-gallery-ui": "*",
+        "magento/module-backend": "*"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Aceextension\\ImageOptmizer\\": ""
+        }
+    }
+}
