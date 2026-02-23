@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Aceextension_ImageOptmizer
+ *
+ * @category    Aceextension
+ * @package     Aceextension_ImageOptmizer
+ * @author      Aceextension
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Media App Plugin for on-the-fly WebP in pub/get.php -->
+    <type name="Magento\MediaStorage\App\Media">
+        <plugin name="Aceextension_ImageOptmizer::media_app_plugin" type="Aceextension\ImageOptmizer\Plugin\App\MediaPlugin" sortOrder="10"/>
+    </type>
+    <!-- Uploader Plugin to enable new extensions -->
+    <type name="Magento\MediaStorage\Model\File\Uploader">
+        <plugin name="Aceextension_ImageOptmizer::uploader_plugin" type="Aceextension\ImageOptmizer\Plugin\File\UploaderPlugin" sortOrder="10"/>
+    </type>
+
+    <!-- Filter out protected extensions -->
+    <type name="Magento\MediaStorage\Model\File\Validator\NotProtectedExtension">
+        <plugin name="Aceextension_ImageOptmizer::validator_plugin" type="Aceextension\ImageOptmizer\Plugin\File\ValidatorPlugin" sortOrder="10"/>
+    </type>
+
+    <!-- Product Image Config to add extensions to Gallery -->
+    <type name="Magento\Catalog\Model\Product\Media\Config">
+        <plugin name="Aceextension_ImageOptmizer::product_media_config" type="Aceextension\ImageOptmizer\Plugin\Catalog\ProductMediaConfigPlugin" sortOrder="10"/>
+    </type>
+
+    <!-- Category Image Support -->
+    <type name="Magento\Catalog\Model\Category\Attribute\Backend\Image">
+        <plugin name="Aceextension_ImageOptmizer::category_image_plugin" type="Aceextension\ImageOptmizer\Plugin\Catalog\CategoryImagePlugin" sortOrder="10"/>
+    </type>
+
+    <!-- Image Adapter Support -->
+    <type name="Magento\Framework\Image\Adapter\Gd2">
+         <plugin name="Aceextension_ImageOptmizer::image_adapter_gd2" type="Aceextension\ImageOptmizer\Plugin\Image\AdapterPlugin" sortOrder="10"/>
+    </type>
+    <type name="Magento\Framework\Image\Adapter\ImageMagick">
+         <plugin name="Aceextension_ImageOptmizer::image_adapter_imagick" type="Aceextension\ImageOptmizer\Plugin\Image\AdapterPlugin" sortOrder="10"/>
+    </type>
+
+    <!-- CMS WYSIWYG support -->
+    <type name="Magento\Cms\Model\Wysiwyg\Images\Storage">
+        <plugin name="Aceextension_ImageOptmizer::wysiwyg_storage_plugin" type="Aceextension\ImageOptmizer\Plugin\Cms\WysiwygStoragePlugin" sortOrder="10"/>
+    </type>
+</config>

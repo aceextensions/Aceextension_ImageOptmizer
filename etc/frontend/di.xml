@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Global URL Rewriting for WebP -->
+    <type name="Magento\Catalog\Model\Product\Image\UrlBuilder">
+        <plugin name="Aceextension_ImageOptmizer::url_builder_plugin" type="Aceextension\ImageOptmizer\Plugin\Frontend\UrlBuilderPlugin" sortOrder="10"/>
+    </type>
+    <type name="Magento\Catalog\Helper\Image">
+        <plugin name="Aceextension_ImageOptmizer::image_helper_plugin" type="Aceextension\ImageOptmizer\Plugin\Frontend\ImageHelperPlugin" sortOrder="10"/>
+    </type>
+    <type name="Magento\Catalog\Model\View\Asset\Image">
+        <plugin name="Aceextension_ImageOptmizer::asset_image_plugin" type="Aceextension\ImageOptmizer\Plugin\Frontend\AssetImagePlugin" sortOrder="10"/>
+    </type>
+
+    <!-- On-demand generation bypass for standard rendering -->
+    <type name="Magento\Catalog\Model\Product\Image">
+        <plugin name="Aceextension_ImageOptmizer::product_image_plugin" type="Aceextension\ImageOptmizer\Plugin\Frontend\ProductImagePlugin" sortOrder="10"/>
+    </type>
+</config>
