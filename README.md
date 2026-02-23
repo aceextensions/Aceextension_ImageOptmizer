@@ -1,41 +1,48 @@
 # Aceextension Image Optimizer for Magento 2
 
-A high-performance image optimization module that provides on-demand WebP/AVIF conversion with zero-overhead frontend rendering.
+A premium, high-performance image optimization suite for Magento 2 that brings modern image formats (WebP, AVIF, SVG) and intelligent lazy-processing to your storefront.
 
-## 🛠 Configuration
+## 🌟 Key Features
 
-Configure the module via **Stores > Configuration > Aceextension > Image Optimizer**.
+### 🖼️ Modern Image Format Support
+- **WebP & AVIF Generation**: Automatically serves ultra-compressed WebP and AVIF images to modern browsers, reducing page weight by up to 80%.
+- **SVG Upload Support**: Enables secure upload and display of SVG vector graphics in product galleries, category banners, and CMS pages.
+- **Enhanced Media Gallery**: Extends the Magento Admin to support modern formats across Product Images, Category Attributes, and the WYSIWYG Media Gallery.
 
-* **Module Enabled**: Master toggle for all optimizations.
-* **Replace Catalog Images with WebP**: When enabled, the module rewrites product/category image URLs to `.webp` in the HTML.
-* **Debug Mode**: Enables detailed logging to `var/log/system.log`.
+### 🚀 Performance Breakthroughs
+- **Near-Zero Rendering Delay**: Revolutionizes image processing by bypassing the heavy `saveFile()` logic during page generation. This ensures near-instant TTFB (Time to First Byte) even on high-traffic category pages.
+- **Lazy Materialization**: Images are generated only when requested by the browser. If a user never scrolls to an image, it is never processed, saving CPU and disk cache.
+- **Plugin Scoping**: Backend and Frontend plugins are strictly scoped to their respective areas to prevent unnecessary overhead in unrelated operations.
 
-## 🏗 How We Achieved It (Architecture)
+### 🛠️ Technical Excellence
+- **PHP 8.4 Modernized**: Fully refactored codebase using the latest PHP 8.4 features including Constructor Property Promotion, `readonly` properties, and strict typing.
+- **Strict Standards Compliance**: adheres to Magento 2 coding standards and architectural best practices.
+- **Pure PHP Implementation**: Operates entirely within the PHP environment (GD or ImageMagick), requiring no external binaries or complex proxy configurations for standard operation.
 
-The module follows a "Lazy Materialization" pattern to ensure Magento never slows down while resizing images during page loads.
+## ⚙️ Configuration
 
-### 1. Frontend URL Hijacking
+Available under **Stores > Configuration > Aceextension > Image Optimizer**:
 
-We use plugins on `Magento\Catalog\Model\Product\Image\UrlBuilder` and `Magento\Catalog\Helper\Image` to rewrite generated image URLs from `.jpg`/`.png` to `.webp` before they hit the HTML.
+*   **Module Enabled**: The master switch for the module's validation and processing logic.
+*   **Replace Catalog Images with WebP**: Toggles the automated URL rewriting on the frontend.
+*   **Debug Mode**: Log detailed conversion and processing events to `var/log/system.log`.
 
-### 2. Rendering Bypass
+## 🏗 Architecture Overview
 
-Magento traditionally resizes and saves images during page execution (`saveFile()`). We use `aroundSaveFile` in `ProductImagePlugin.php` to bypass this process. This results in **near-instant page rendering**, especially on pages with many products.
+The module utilizes a **Lazy Materialization** pattern:
 
-### 3. On-Demand Materialization (Optimized pub/get.php)
+1.  **URL Hijacking**: Intercepts URL generation and rewrites `.jpg`/`.png` extensions to `.webp`.
+2.  **Processing Bypass**: Stops Magento from physically creating the resized file during the initial page request.
+3.  **On-Demand Processing**: When the browser requests the missing `.webp` file:
+    -   Nginx routes the request to `pub/get.php`.
+    -   Our `MediaPlugin` intercepts the request.
+    -   The plugin generates the required source image and instantly converts it to WebP/AVIF.
+    -   The optimized image is served with correct headers.
 
-When a browser requests a `.webp` file that doesn't exist on disk, Nginx falls back to `pub/get.php` (Magento's native image generator).
+## 📋 Compatibility
+- **Magento**: 2.4.x
+- **PHP**: 8.1 / 8.2 / 8.3 / 8.4
+- **Graphics Library**: GD2 or ImageMagick (Native Magento Adapters)
 
-We implemented **`Aceextension\ImageOptmizer\Plugin\App\MediaPlugin`** which:
-
-1. Intercepts the request for `.webp`.
-2. Temporarily swaps the request to the high-quality `.jpg` source using Reflection.
-3. Triggers Magento's native image generation logic to create the `.jpg` cache file.
-4. Converts the newly created `.jpg` to `.webp` using PHP GD/Imagick.
-5. Updates the response to serve the WebP file directly.
-
-## 🚀 Why This Approach?
-
-1. **Speed**: Page weight is reduced significantly via WebP, but more importantly, **TTFB (Time To First Byte)** is improved because Magento doesn't wait for image processing before sending HTML.
-2. **Stability**: By leveraging `Media.php`, we avoid creating security holes often found in standalone image proxy scripts.
-3. **Efficiency**: Images are only generated when actually requested by a user's browser, saving both CPU and disk space for ignored or outdated cache sizes.
+## 📄 License
+Copyright (c) 2019 Aceextensions Extensions (http://aceextensions.com)
