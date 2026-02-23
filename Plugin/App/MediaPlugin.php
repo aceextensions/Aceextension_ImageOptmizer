@@ -51,25 +51,36 @@ class MediaPlugin
             $requestedFile = $relativeFileNameProp->getValue($subject);
 
             if ($requestedFile && preg_match('/\.webp$/i', (string)$requestedFile)) {
-                // Try to find the source image (jpg or png)
-                $sourceFile = preg_replace('/\.webp$/i', '.jpg', (string)$requestedFile);
+                $directoryPubProp = $reflection->getProperty('directoryPub');
+                $directoryPubProp->setAccessible(true);
+                $directoryPub = $directoryPubProp->getValue($subject);
 
-                // Swap the relativeFileName to source file to let Magento generate the JPG first
+                $originalWebpPath = preg_replace('#/cache/[a-z0-9]+/#i', '/', (string)$requestedFile);
+
+                if ($directoryPub->isFile($originalWebpPath)) {
+                    // Source is natively WebP, let Magento generate WebP cache directly
+                    return $proceed();
+                }
+
+                $originalPngPath = preg_replace('/\.webp$/i', '.png', $originalWebpPath);
+                if ($directoryPub->isFile($originalPngPath)) {
+                    $sourceFile = preg_replace('/\.webp$/i', '.png', (string)$requestedFile);
+                } else {
+                    // Fallback to JPG
+                    $sourceFile = preg_replace('/\.webp$/i', '.jpg', (string)$requestedFile);
+                }
+
+                // Swap the relativeFileName to source file to let Magento generate the cache intermediate first
                 $relativeFileNameProp->setValue($subject, $sourceFile);
 
                 /** @var ResponseInterface $response */
                 $response = $proceed();
 
-                // Get the pub directory to locate physical files
-                $directoryPubProp = $reflection->getProperty('directoryPub');
-                $directoryPubProp->setAccessible(true);
-                $directoryPub = $directoryPubProp->getValue($subject);
-
                 $sourceAbsolutePath = $directoryPub->getAbsolutePath($sourceFile);
                 $webpAbsolutePath = $directoryPub->getAbsolutePath($requestedFile);
 
                 if (file_exists($sourceAbsolutePath)) {
-                    // Convert the generated JPG to WebP
+                    // Convert the generated JPG/PNG to WebP
                     if ($this->imageHelper->convertToWebp($sourceAbsolutePath, $webpAbsolutePath)) {
                         // Update the response to serve the newly created WebP file
                         if ($response instanceof HttpResponse && method_exists($response, 'setFilePath')) {
@@ -79,7 +90,11 @@ class MediaPlugin
                             $response->clearHeader('Content-Type');
                             $response->setHeader('Content-Type', 'image/webp');
                         }
+                    } else {
+                        $this->imageHelper->log("Failed to convert {$sourceAbsolutePath} to WebP.");
                     }
+                } else {
+                    $this->imageHelper->log("Generated source file not found: {$sourceAbsolutePath}");
                 }
 
                 // Restore the original requested filename state for the subject
@@ -88,6 +103,7 @@ class MediaPlugin
                 return $response;
             }
         } catch (\Exception $e) {
+            $this->imageHelper->log("MediaPlugin exception: " . $e->getMessage());
             return $proceed();
         }
 

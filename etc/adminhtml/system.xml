@@ -19,10 +19,13 @@
             <resource>Aceextension_ImageOptmizer::config</resource>
             <group id="general" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                 <label>General Configuration</label>
+                <field id="imagemagick_warning" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <frontend_model>Aceextension\ImageOptmizer\Block\Adminhtml\System\Config\ImageMagickWarning</frontend_model>
+                </field>
                 <field id="enabled" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Enable Image Optimizer Module</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                    <comment>Master switch to enable or disable the SVG, WebP, and AVIF upload capabilities.</comment>
+                    <comment><![CDATA[Master switch to enable or disable the SVG, WebP, and AVIF upload capabilities.<br/><strong style="color:#e22626;">Note: ImageMagick should be enabled as the default image adapter for best results with modern formats.</strong>]]></comment>
                 </field>
                 <field id="replace_catalog_images_with_webp" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Replace Catalog Images with WebP on Frontend</label>

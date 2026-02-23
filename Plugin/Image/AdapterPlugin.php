@@ -17,7 +17,7 @@ class AdapterPlugin
     ) {}
 
     /**
-     * Bypassing image processing for SVG
+     * Bypassing image processing for SVG and injecting modern format support
      *
      * @param AdapterInterface $subject
      * @param string|null $filename
@@ -25,6 +25,8 @@ class AdapterPlugin
      */
     public function beforeOpen(AdapterInterface $subject, ?string $filename): void
     {
+        $this->injectModernFormatSupport($subject);
+
         if (!$filename) {
             return;
         }
@@ -80,6 +82,41 @@ class AdapterPlugin
      */
     public function afterGetSupportedFormats(AdapterInterface $subject, array $result): array
     {
+        $this->injectModernFormatSupport($subject);
         return array_unique(array_merge($result, $this->imageHelper->getAllowedExtensions()));
+    }
+
+    /**
+     * Inject WebP/AVIF callbacks into GD2/Imagick adapters
+     *
+     * @param AdapterInterface $subject
+     * @return void
+     */
+    private function injectModernFormatSupport(AdapterInterface $subject): void
+    {
+        try {
+            if ($subject instanceof \Magento\Framework\Image\Adapter\Gd2) {
+                $reflection = new \ReflectionClass(\Magento\Framework\Image\Adapter\Gd2::class);
+                if ($reflection->hasProperty('_callbacks')) {
+                    $property = $reflection->getProperty('_callbacks');
+                    $property->setAccessible(true);
+                    $callbacks = $property->getValue();
+
+                    if (defined('IMAGETYPE_WEBP') && !isset($callbacks[IMAGETYPE_WEBP])) {
+                        $callbacks[IMAGETYPE_WEBP] = ['output' => 'imagewebp', 'create' => 'imagecreatefromwebp'];
+                    }
+                    if (defined('IMAGETYPE_AVIF') && !isset($callbacks[IMAGETYPE_AVIF])) {
+                        $callbacks[IMAGETYPE_AVIF] = ['output' => 'imageavif', 'create' => 'imagecreatefromavif'];
+                    }
+
+                    $property->setValue(null, $callbacks);
+                }
+            } elseif ($subject instanceof \Magento\Framework\Image\Adapter\ImageMagick) {
+                // ImageMagick usually supports them natively if installed, 
+                // but we can ensure they are in supported list via getSupportedFormats
+            }
+        } catch (\Exception $e) {
+            // Silence is golden
+        }
     }
 }

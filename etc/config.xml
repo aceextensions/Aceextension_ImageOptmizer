@@ -12,7 +12,7 @@
     <default>
         <ace_image_optimizer>
             <general>
-                <enabled>1</enabled>
+                <enabled>0</enabled>
                 <replace_catalog_images_with_webp>1</replace_catalog_images_with_webp>
                 <debug>0</debug>
             </general>

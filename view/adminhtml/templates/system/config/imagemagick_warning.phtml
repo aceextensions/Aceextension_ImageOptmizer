@@ -1,0 +1,18 @@
+<?php
+
+/** @var \Aceextension\ImageOptmizer\Block\Adminhtml\System\Config\ImageMagickWarning $block */
+?>
+<?php if ($block->shouldDisplayWarning()): ?>
+    <div class="message message-warning warning">
+        <div class="message-inner">
+            <div class="message-content">
+                <strong>Attention: ImageMagick Preferred!</strong><br />
+                The <strong>Aceextension Image Optimizer</strong> module is currently enabled, but your store's Image Adapter is set to GD2.
+                GD2 has known limitations when generating modern image formats like WebP or AVIF.<br /><br />
+                For the best performance and compatibility, please navigate to
+                <strong>Stores > Configuration > Advanced > Developer > Image Processing Settings</strong>
+                and change the <strong>Image Adapter</strong> to <strong>ImageMagick</strong>.
+            </div>
+        </div>
+    </div>
+<?php endif; ?>

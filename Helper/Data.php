@@ -116,6 +116,7 @@ class Data extends AbstractHelper
 
         $image = match ($info['mime']) {
             'image/jpeg' => imagecreatefromjpeg($sourcePath),
+            'image/webp' => imagecreatefromwebp($sourcePath),
             'image/png' => (function () use ($sourcePath) {
                 $img = imagecreatefrompng($sourcePath);
                 if ($img === false) {
@@ -159,6 +160,8 @@ class Data extends AbstractHelper
 
         $image = match ($info['mime']) {
             'image/jpeg' => imagecreatefromjpeg($sourcePath),
+            'image/webp' => imagecreatefromwebp($sourcePath),
+            'image/avif' => imagecreatefromavif($sourcePath),
             'image/png' => (function () use ($sourcePath) {
                 $img = imagecreatefrompng($sourcePath);
                 if ($img === false) {
@@ -186,7 +189,12 @@ class Data extends AbstractHelper
      */
     public function isMaterializationMode(): bool
     {
-        $requestUri = $this->request->getRequestUri();
-        return str_contains($requestUri, 'get.php');
+        $requestUri = (string)($this->request->getServer('REQUEST_URI') ?: $this->request->getRequestUri());
+        $scriptName = (string)$this->request->getServer('SCRIPT_NAME');
+        $phpSelf = (string)$this->request->getServer('PHP_SELF');
+
+        return str_contains($requestUri, 'get.php') ||
+            str_contains($scriptName, 'get.php') ||
+            str_contains($phpSelf, 'get.php');
     }
 }
