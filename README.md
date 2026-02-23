@@ -10,14 +10,26 @@ A premium, high-performance image optimization suite for Magento 2 that brings m
 - **Enhanced Media Gallery**: Extends the Magento Admin to support modern formats across Product Images, Category Attributes, and the WYSIWYG Media Gallery.
 
 ### 🚀 Performance Breakthroughs
-- **Near-Zero Rendering Delay**: Revolutionizes image processing by bypassing the heavy `saveFile()` logic during page generation. This ensures near-instant TTFB (Time to First Byte) even on high-traffic category pages.
+- **Near-Zero Rendering Delay**: Revolutionizes image processing by deferring physical file generation from the initial page request to `pub/get.php`. This ensures near-instant TTFB (Time to First Byte).
+- **Graceful Nativization**: Intelligently handles source images that are natively WebP or PNG without forcing unnecessary JPEG conversions.
 - **Lazy Materialization**: Images are generated only when requested by the browser. If a user never scrolls to an image, it is never processed, saving CPU and disk cache.
-- **Plugin Scoping**: Backend and Frontend plugins are strictly scoped to their respective areas to prevent unnecessary overhead in unrelated operations.
 
 ### 🛠️ Technical Excellence
-- **PHP 8.4 Modernized**: Fully refactored codebase using the latest PHP 8.4 features including Constructor Property Promotion, `readonly` properties, and strict typing.
-- **Strict Standards Compliance**: adheres to Magento 2 coding standards and architectural best practices.
-- **Pure PHP Implementation**: Operates entirely within the PHP environment (GD or ImageMagick), requiring no external binaries or complex proxy configurations for standard operation.
+- **PHP 8.1+ Optimized**: Fully modern codebase adhering to Magento 2 coding standards, strict typing, and PHP 8+ features.
+- **ImageMagick Enforcement**: Intelligently hooks into the Magento Admin to warn administrators and enforce the use of `ImageMagick` over `GD2` for superior modern format support.
+- **Pure PHP Implementation**: Operates entirely within the PHP environment, requiring no external binaries or complex proxy configurations for standard operation.
+
+## 📦 Installation via Composer (Packagist)
+
+The recommended way to install this extension is via Composer.
+
+```bash
+composer require aceextensions/module-imageoptimizer
+bin/magento module:enable Aceextension_ImageOptmizer
+bin/magento setup:upgrade
+bin/magento cache:clean
+```
+
 
 ## ⚙️ Configuration
 
@@ -40,9 +52,9 @@ The module utilizes a **Lazy Materialization** pattern:
     -   The optimized image is served with correct headers.
 
 ## 📋 Compatibility
-- **Magento**: 2.4.x
-- **PHP**: 8.1 / 8.2 / 8.3 / 8.4
-- **Graphics Library**: GD2 or ImageMagick (Native Magento Adapters)
+- **Magento**: 2.4.4+
+- **PHP**: 8.1 / 8.2 / 8.3
+- **Graphics Library**: ImageMagick (Strongly Recommended & Enforced via Admin UI Warning)
 
 ## 📄 License
 Copyright (c) 2019 Aceextensions Extensions (http://aceextensions.com)
