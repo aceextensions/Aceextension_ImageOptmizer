@@ -115,7 +115,7 @@ class AdapterPlugin
                         $callbacks[IMAGETYPE_AVIF] = ['output' => 'imageavif', 'create' => 'imagecreatefromavif'];
                     }
 
-                    $property->setValue(null, $callbacks);
+                    $property->setValue($subject, $callbacks);
                 }
             } elseif ($subject instanceof \Magento\Framework\Image\Adapter\ImageMagick) {
                 // ImageMagick usually supports them natively if installed, 
